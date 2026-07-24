@@ -1,12 +1,12 @@
-# Computational Modelling of Spanish-English Code-switching
+# Computational Analysis of Spanish-English Code-switching
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB)](https://www.python.org/)
-[![Tests](https://img.shields.io/badge/tests-6%20passed-success)](#testing)
+[![Tests](https://img.shields.io/badge/tests-8%20passed-success)](#testing)
 [![Corpus](https://img.shields.io/badge/data-Bangor%20Miami-5B4B8A)](http://bangortalk.org.uk/)
 
-This portfolio project turns naturally occurring Spanish-English conversation
-into a reproducible computational-linguistics workflow. It parses CHAT headers,
-aligns pseudonymised speakers with questionnaire metadata, reads heterogeneous
+This portfolio turns naturally occurring Spanish-English conversation into a
+reproducible computational-linguistics workflow. It parses CHAT headers, aligns
+pseudonymised speakers with questionnaire metadata, reads heterogeneous
 word-level TSV files, detects conservative within-utterance language
 transitions, and produces participant-level rates.
 
@@ -18,28 +18,26 @@ how linguistic questions can be operationalised as transparent Python code.
 > Is educational level associated with conservative intra-sentential
 > Spanish-English code-switching frequency in the Bangor Miami Corpus?
 
-The analysis does **not** assume that every apparent bilingual token is a
-switch. It uses a deliberately conservative primary definition:
+The analysis uses a deliberately conservative primary definition:
 
-- compare tokens only within the same recording, speaker and utterance;
+- compare tokens only within the same recording, speaker, and utterance;
 - count only adjacent `eng → spa` or `spa → eng` transitions;
 - treat every other language label as a boundary;
 - standardise by valid `eng + spa` tokens.
 
 ## Why this is a computational-linguistics portfolio
 
-The main technical contribution is not a claim of statistical significance. It
-is an auditable pipeline for messy bilingual speech data:
+The main technical contribution is an auditable pipeline for messy bilingual
+speech data:
 
 1. parses CHAT participant and `@ID` tiers;
 2. calculates age at recording from recording date and date of birth;
-3. confirms speaker mappings only with unique filename + age + sex evidence;
-4. accommodates multiple TSV column schemas by reading columns by name;
+3. confirms mappings only with unique filename + age + sex evidence;
+4. accommodates multiple TSV schemas by reading columns by name;
 5. removes corpus footer records without deleting linguistic tokens;
-6. handles ambiguous, mixed-morpheme and non-word labels explicitly;
-7. generates token-, recording- and participant-level quality checks;
-8. reproduces Welch ANOVA, Kruskal-Wallis, ordinary ANOVA and HC3 regression
-   without opaque statistical dependencies;
+6. handles ambiguous, mixed-morpheme, and non-word labels explicitly;
+7. generates token-, recording-, and participant-level quality checks;
+8. reproduces Welch ANOVA, Kruskal-Wallis, ordinary ANOVA, and HC3 regression;
 9. separates descriptive trends from inferential evidence.
 
 ## Verified full-corpus run
@@ -58,7 +56,7 @@ Corpus. Raw corpus and questionnaire files are not redistributed here.
 | Conservative switch events | 2,980 |
 | Overall pooled rate | 15.21 per 1,000 valid tokens |
 
-Education-group means were 13.63 (Low, n=5), 14.81 (Middle, n=31) and
+Education-group means were 13.63 (Low, n=5), 14.81 (Middle, n=31), and
 15.74 (High, n=37). Robust and non-parametric analyses found no reliable
 evidence of a group difference. This null result is retained rather than
 optimised away.
@@ -66,7 +64,11 @@ optimised away.
 ![Mean conservative switch rate by education group](assets/education-group-rates.svg)
 
 See the [aggregate full-corpus results](docs/FULL_CORPUS_RESULTS.md) for the
-descriptive table, inferential checks and responsible interpretation.
+descriptive table, inferential checks, and responsible interpretation.
+
+The complete five-page portfolio paper is available in
+[Word](report/Bangor_Miami_Computational_Analysis_Mini_Paper.docx) and
+[PDF](report/Bangor_Miami_Computational_Analysis_Mini_Paper.pdf).
 
 ## Repository structure
 
@@ -76,6 +78,7 @@ descriptive table, inferential checks and responsible interpretation.
 │   ├── raw/                    # ignored; place licensed local files here
 │   └── sample/                 # synthetic, redistributable fixture
 ├── notebooks/                  # guided portfolio walkthroughs
+├── report/                     # five-page portfolio paper
 ├── src/bangor_miami/
 │   ├── chat.py                 # CHAT-header parser
 │   ├── metadata.py             # CSV/XLSX metadata reader
@@ -108,17 +111,9 @@ python -m unittest discover -s tests -v
 python -m bangor_miami demo --output-dir results/demo
 ```
 
-The demo produces:
-
-- `mapping_audit.csv`
-- `switch_events.csv`
-- `recording_rates.csv`
-- `participant_rates.csv`
-- `group_descriptives.csv`
-- `inferential_tests.csv` (when the analyzable sample is large enough)
-- `education_level_regression.csv`
-- `statistical_summary.json`
-- `summary.json`
+The demo produces mapping audits, switch events, recording and participant
+rates, descriptive summaries, inferential tests, an ordinal regression, and a
+machine-readable statistical summary.
 
 ## Running with locally licensed corpus files
 
@@ -161,16 +156,10 @@ five corpus codes.
 
 ## Testing
 
-The tests cover:
-
-- CHAT header extraction;
-- unique and ambiguous speaker mapping;
-- footer removal from TSV files;
-- within-utterance transition detection;
-- resetting the sequence at `999` and ambiguous labels;
-- preventing transitions across utterance boundaries;
-- end-to-end synthetic pipeline output.
-- ANOVA probability bounds and inferential output schema.
+The eight tests cover CHAT extraction, conservative mapping, TSV footer
+removal, switch detection and sequence resets, utterance boundaries,
+end-to-end output, statistical probability bounds, and inferential output
+schemas.
 
 ```bash
 python -m unittest discover -s tests -v
@@ -178,9 +167,9 @@ python -m unittest discover -s tests -v
 
 ## Ethics and data availability
 
-The Bangor Miami Corpus has its own licence, citation requirements and
+The Bangor Miami Corpus has its own licence, citation requirements, and
 TalkBank ethics conditions. This repository deliberately excludes raw corpus
-audio, transcripts, questionnaire responses and full token-level exports.
+audio, transcripts, questionnaire responses, and full token-level exports.
 Users must obtain the source data from the official corpus provider and follow
 its conditions of use.
 
@@ -190,9 +179,9 @@ its conditions of use.
 - the Low education group is very small;
 - the primary metric captures conservative token transitions, not every
   linguistic definition of code-switching;
-- conversation topic, interlocutor relationship and language proficiency are
+- conversation topic, interlocutor relationship, and language proficiency are
   not yet modelled;
-- the current statistical result is associational, not causal.
+- the statistical result is associational, not causal.
 
 ## Suggested extensions
 
