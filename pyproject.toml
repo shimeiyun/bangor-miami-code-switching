@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bangor-miami-codeswitch"
+version = "0.1.0"
+description = "A reproducible corpus pipeline for conservative Spanish-English code-switch analysis."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{name = "Portfolio Author"}]
+license = {text = "MIT"}
+dependencies = []
+
+[project.optional-dependencies]
+xlsx = ["openpyxl>=3.1"]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+bangor-miami = "bangor_miami.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+

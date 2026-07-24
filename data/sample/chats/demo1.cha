@@ -1,0 +1,11 @@
+@UTF8
+@Begin
+@Languages:	eng, spa
+@Participants:	ALI Alice Adult, BOB Bob Adult
+@ID:	spa, eng|Demo|ALI|25;|female|||Adult|||
+@ID:	spa, eng|Demo|BOB|30;|male|||Adult|||
+@Media:	demo1, audio
+*ALI:	I like café@s:spa .
+*BOB:	hola@s:spa friend@s:eng .
+@End
+
