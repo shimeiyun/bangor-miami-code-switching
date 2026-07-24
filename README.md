@@ -38,7 +38,9 @@ is an auditable pipeline for messy bilingual speech data:
 5. removes corpus footer records without deleting linguistic tokens;
 6. handles ambiguous, mixed-morpheme and non-word labels explicitly;
 7. generates token-, recording- and participant-level quality checks;
-8. separates descriptive trends from inferential evidence.
+8. reproduces Welch ANOVA, Kruskal-Wallis, ordinary ANOVA and HC3 regression
+   without opaque statistical dependencies;
+9. separates descriptive trends from inferential evidence.
 
 ## Verified full-corpus run
 
@@ -81,6 +83,7 @@ descriptive table, inferential checks and responsible interpretation.
 │   ├── tokens.py               # heterogeneous TSV reader
 │   ├── switches.py             # transition detector
 │   ├── analysis.py             # participant aggregation
+│   ├── statistics.py           # inferential tests and HC3 regression
 │   ├── pipeline.py             # end-to-end orchestration
 │   └── cli.py                  # command-line interface
 ├── tests/
@@ -112,6 +115,9 @@ The demo produces:
 - `recording_rates.csv`
 - `participant_rates.csv`
 - `group_descriptives.csv`
+- `inferential_tests.csv` (when the analyzable sample is large enough)
+- `education_level_regression.csv`
+- `statistical_summary.json`
 - `summary.json`
 
 ## Running with locally licensed corpus files
@@ -164,6 +170,7 @@ The tests cover:
 - resetting the sequence at `999` and ambiguous labels;
 - preventing transitions across utterance boundaries;
 - end-to-end synthetic pipeline output.
+- ANOVA probability bounds and inferential output schema.
 
 ```bash
 python -m unittest discover -s tests -v

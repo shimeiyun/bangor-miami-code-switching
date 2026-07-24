@@ -8,6 +8,7 @@ from .chat import chat_inventory
 from .mapping import CONFIRMED, audit_mapping
 from .metadata import read_metadata
 from .switches import conservative_switches
+from .statistics import inferential_analysis
 from .tokens import iter_tsv_tokens
 from .utils import write_csv
 
@@ -41,6 +42,7 @@ def run_pipeline(
     events, recordings = conservative_switches(included_tokens)
     participants = aggregate_participants(recordings)
     descriptives = group_descriptives(participants)
+    inference = inferential_analysis(participants) if len(participants) >= 6 else None
     output_dir.mkdir(parents=True, exist_ok=True)
     write_csv(
         output_dir / "mapping_audit.csv",
@@ -63,6 +65,24 @@ def run_pipeline(
         descriptives,
         list(descriptives[0]),
     )
+    if inference is not None:
+        write_csv(
+            output_dir / "inferential_tests.csv",
+            inference["tests"],
+            ["test", "statistic", "df1", "df2", "p_value", "role"],
+        )
+        regression_rows = [
+            {"term": key, "value": value}
+            for key, value in inference["hc3_regression"].items()
+        ]
+        write_csv(
+            output_dir / "education_level_regression.csv",
+            regression_rows,
+            ["term", "value"],
+        )
+        (output_dir / "statistical_summary.json").write_text(
+            json.dumps(inference, indent=2), encoding="utf-8"
+        )
     summary = {
         "chat_speaker_file_rows": len(chat_rows),
         "confirmed_mappings": len(confirmed),
@@ -70,9 +90,9 @@ def run_pipeline(
         "switch_events": len(events),
         "independent_participants": len(participants),
         "method": "within-utterance adjacent eng↔spa; every other label resets",
+        "inferential_analysis_run": inference is not None,
     }
     (output_dir / "summary.json").write_text(
         json.dumps(summary, indent=2), encoding="utf-8"
     )
     return summary
-

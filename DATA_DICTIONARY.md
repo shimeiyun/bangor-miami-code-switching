@@ -47,3 +47,25 @@ intra_switch_count / valid_eng_spa_tokens × 1,000
 
 Only `eng` and `spa` contribute to the denominator.
 
+## Statistical outputs
+
+### `inferential_tests.csv`
+
+| Column | Meaning |
+|---|---|
+| `test` | Name of the omnibus or sensitivity test |
+| `statistic` | Test statistic |
+| `df1`, `df2` | Degrees of freedom where applicable |
+| `p_value` | Computed tail probability |
+| `role` | Pre-declared analytical purpose |
+
+### `education_level_regression.csv`
+
+Long-format output containing the ordinal education-level slope, HC3 robust
+standard error, t statistic, p-value, normal-approximation confidence interval,
+R-squared and sample size.
+
+### `statistical_summary.json`
+
+Structured combined output containing all inferential tests, ordinary-ANOVA
+effect size, HC3 regression and the IQR outlier sensitivity audit.

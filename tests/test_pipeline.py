@@ -14,6 +14,11 @@ from bangor_miami.chat import parse_chat_header
 from bangor_miami.mapping import CONFIRMED, audit_mapping
 from bangor_miami.pipeline import run_pipeline
 from bangor_miami.switches import conservative_switches
+from bangor_miami.statistics import (
+    inferential_analysis,
+    ordinary_anova,
+    welch_anova,
+)
 from bangor_miami.tokens import iter_tsv_tokens
 
 
@@ -102,6 +107,32 @@ class EndToEndTests(unittest.TestCase):
             self.assertEqual(saved, summary)
 
 
+class StatisticalTests(unittest.TestCase):
+    def test_anova_functions_return_valid_probabilities(self):
+        groups = {
+            "Low": [1.0, 2.0, 3.0, 4.0],
+            "Middle": [2.0, 3.0, 4.0, 5.0],
+            "High": [3.0, 4.0, 5.0, 6.0],
+        }
+        for result in (ordinary_anova(groups), welch_anova(groups)):
+            self.assertGreaterEqual(result["p_value"], 0.0)
+            self.assertLessEqual(result["p_value"], 1.0)
+            self.assertGreater(result["statistic"], 0.0)
+
+    def test_full_inference_schema(self):
+        participants = []
+        for level, group in ((1, "Low"), (3, "Middle"), (5, "High")):
+            for index, rate in enumerate((2.0, 4.0, 6.0, 8.0)):
+                participants.append({
+                    "questionnaire_id": f"{group}{index}",
+                    "education_level": level,
+                    "education_group": group,
+                    "switch_rate_per_1000_valid_tokens": rate + level,
+                })
+        result = inferential_analysis(participants)
+        self.assertEqual(len(result["tests"]), 6)
+        self.assertEqual(result["hc3_regression"]["n"], 12)
+
+
 if __name__ == "__main__":
     unittest.main()
-
