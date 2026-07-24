@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata below."
+title: "Computational Analysis of Spanish-English Code-switching"
+type: software
+version: 0.1.0
+date-released: "2026-07-24"
+authors:
+  - name: "shimeiyun"
+abstract: >-
+  A reproducible Python pipeline for conservative within-utterance
+  Spanish-English code-switching analysis in the Bangor Miami Corpus. The
+  software parses CHAT headers, aligns pseudonymised speakers with questionnaire
+  metadata without guessing unresolved identities, reads heterogeneous
+  word-level TSV files, calculates participant-level switching rates, and
+  performs descriptive and inferential statistical analysis.
+keywords:
+  - code-switching
+  - computational linguistics
+  - corpus linguistics
+  - bilingualism
+  - natural language processing
+  - reproducible research
+license: MIT
+repository-code: "https://github.com/shimeiyun/bangor-miami-code-switching"
+url: "https://github.com/shimeiyun/bangor-miami-code-switching"
