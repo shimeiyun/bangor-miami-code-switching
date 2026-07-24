@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: "If you use this software, please cite it using the metadata below."
 title: "Computational Analysis of Spanish-English Code-switching"
 type: software
-version: 0.1.0
+version: 1.0.0
 date-released: "2026-07-24"
 authors:
   - name: "shimeiyun"

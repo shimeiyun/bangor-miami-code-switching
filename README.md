@@ -2,6 +2,7 @@
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB)](https://www.python.org/)
 [![Tests](https://github.com/shimeiyun/bangor-miami-code-switching/actions/workflows/tests.yml/badge.svg)](https://github.com/shimeiyun/bangor-miami-code-switching/actions/workflows/tests.yml)
+[![Release](https://img.shields.io/badge/release-v1.0.0-176B87)](https://github.com/shimeiyun/bangor-miami-code-switching/releases/tag/v1.0.0)
 [![Corpus](https://img.shields.io/badge/data-Bangor%20Miami-5B4B8A)](http://bangortalk.org.uk/)
 
 This portfolio turns naturally occurring Spanish-English conversation into a
