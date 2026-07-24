@@ -1,7 +1,7 @@
 # Computational Analysis of Spanish-English Code-switching
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB)](https://www.python.org/)
-[![Tests](https://img.shields.io/badge/tests-8%20passed-success)](#testing)
+[![Tests](https://github.com/shimeiyun/bangor-miami-code-switching/actions/workflows/tests.yml/badge.svg)](https://github.com/shimeiyun/bangor-miami-code-switching/actions/workflows/tests.yml)
 [![Corpus](https://img.shields.io/badge/data-Bangor%20Miami-5B4B8A)](http://bangortalk.org.uk/)
 
 This portfolio turns naturally occurring Spanish-English conversation into a
