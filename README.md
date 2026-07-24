@@ -1,7 +1,7 @@
 # Computational Modelling of Spanish-English Code-switching
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB)](https://www.python.org/)
-[![Tests](https://img.shields.io/badge/tests-unittest-success)](#testing)
+[![Tests](https://img.shields.io/badge/tests-6%20passed-success)](#testing)
 [![Corpus](https://img.shields.io/badge/data-Bangor%20Miami-5B4B8A)](http://bangortalk.org.uk/)
 
 This portfolio project turns naturally occurring Spanish-English conversation
@@ -60,6 +60,11 @@ Education-group means were 13.63 (Low, n=5), 14.81 (Middle, n=31) and
 15.74 (High, n=37). Robust and non-parametric analyses found no reliable
 evidence of a group difference. This null result is retained rather than
 optimised away.
+
+![Mean conservative switch rate by education group](assets/education-group-rates.svg)
+
+See the [aggregate full-corpus results](docs/FULL_CORPUS_RESULTS.md) for the
+descriptive table, inferential checks and responsible interpretation.
 
 ## Repository structure
 
