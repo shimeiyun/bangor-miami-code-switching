@@ -29,7 +29,9 @@ reported in `mapping_audit.csv` but excluded from education analysis.
 Tokens are ordered within each recording, speaker and utterance. A switch is
 counted only for adjacent `eng -> spa` or `spa -> eng` tokens. Any other label,
 including `999`, mixed labels and transcription artefacts, resets the sequence.
-The detector never bridges an utterance boundary.
+The rule-based identifier never bridges an utterance boundary. It operates on
+the corpus-provided token-level language annotations; it is not an automatic
+language-identification classifier.
 
 For participant `i`:
 

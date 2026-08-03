@@ -22,7 +22,7 @@
 | `filename` | Recording identifier |
 | `speaker` | CHAT speaker code |
 | `word_id` | Corpus word-row identifier |
-| `utterance_id` | Utterance boundary used by the conservative detector |
+| `utterance_id` | Utterance boundary used by conservative transition identification |
 | `location` | Token position within the utterance |
 | `surface` | Transcribed surface form |
 | `langid` | Corpus language label |

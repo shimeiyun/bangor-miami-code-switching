@@ -8,15 +8,17 @@
 This portfolio turns naturally occurring Spanish-English conversation into a
 reproducible computational-linguistics workflow. It parses CHAT headers, aligns
 pseudonymised speakers with questionnaire metadata, reads heterogeneous
-word-level TSV files, detects conservative within-utterance language
-transitions, and produces participant-level rates.
+word-level TSV files, identifies conservative within-utterance transitions
+from corpus-provided language annotations, and produces participant-level
+rates.
 
-The project was designed by a multilingual linguistics student to demonstrate
-how linguistic questions can be operationalised as transparent Python code.
+The project was designed by Meiyun Shi, a multilingual linguistics student, to
+demonstrate how linguistic questions can be operationalised as transparent
+Python code.
 
 ## Research question
 
-> Is educational level associated with conservative intra-sentential
+> Is educational level associated with conservative within-utterance
 > Spanish-English code-switching frequency in the Bangor Miami Corpus?
 
 The analysis uses a deliberately conservative primary definition:
@@ -67,7 +69,7 @@ optimised away.
 See the [aggregate full-corpus results](docs/FULL_CORPUS_RESULTS.md) for the
 descriptive table, inferential checks, and responsible interpretation.
 
-The complete five-page portfolio paper is available in
+The complete portfolio paper is available in
 [Word](report/Bangor_Miami_Computational_Analysis_Mini_Paper.docx) and
 [PDF](report/Bangor_Miami_Computational_Analysis_Mini_Paper.pdf).
 
@@ -85,7 +87,7 @@ The complete five-page portfolio paper is available in
 │   ├── metadata.py             # CSV/XLSX metadata reader
 │   ├── mapping.py              # conservative speaker alignment
 │   ├── tokens.py               # heterogeneous TSV reader
-│   ├── switches.py             # transition detector
+│   ├── switches.py             # annotated transition identifier
 │   ├── analysis.py             # participant aggregation
 │   ├── statistics.py           # inferential tests and HC3 regression
 │   ├── pipeline.py             # end-to-end orchestration
@@ -158,7 +160,7 @@ five corpus codes.
 ## Testing
 
 The eight tests cover CHAT extraction, conservative mapping, TSV footer
-removal, switch detection and sequence resets, utterance boundaries,
+removal, switch-point identification and sequence resets, utterance boundaries,
 end-to-end output, statistical probability bounds, and inferential output
 schemas.
 
@@ -173,6 +175,12 @@ TalkBank ethics conditions. This repository deliberately excludes raw corpus
 audio, transcripts, questionnaire responses, and full token-level exports.
 Users must obtain the source data from the official corpus provider and follow
 its conditions of use.
+
+The repository's MIT License applies to the original software and synthetic
+fixtures created for this portfolio. It does not relicense the Bangor Miami
+Corpus, its audio, transcripts, annotations, questionnaire data, or any other
+third-party material. Those resources remain subject to the corpus provider's
+licence, citation requirements, and TalkBank ethics conditions.
 
 ## Limitations
 

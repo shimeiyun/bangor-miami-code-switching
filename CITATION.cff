@@ -5,14 +5,16 @@ type: software
 version: 1.0.0
 date-released: "2026-07-24"
 authors:
-  - name: "shimeiyun"
+  - family-names: "Shi"
+    given-names: "Meiyun"
 abstract: >-
   A reproducible Python pipeline for conservative within-utterance
   Spanish-English code-switching analysis in the Bangor Miami Corpus. The
   software parses CHAT headers, aligns pseudonymised speakers with questionnaire
   metadata without guessing unresolved identities, reads heterogeneous
-  word-level TSV files, calculates participant-level switching rates, and
-  performs descriptive and inferential statistical analysis.
+  word-level TSV files, identifies transitions from corpus-provided language
+  annotations, calculates participant-level switching rates, and performs
+  descriptive and inferential statistical analysis.
 keywords:
   - code-switching
   - computational linguistics
