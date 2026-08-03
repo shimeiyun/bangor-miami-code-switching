@@ -46,16 +46,13 @@ field. Eligible pairs are the more direct denominator because each pair is one
 opportunity under the implemented transition rule. This operational definition
 is intentionally narrower than the full linguistic concept of code-switching.
 
-## Statistical model
+## Statistical analysis
 
-The primary participant-level model treats `intra_switch_count` as a count and
-uses `log(eligible_adjacent_pairs)` as an offset. Education level enters as an
-ordinal predictor in a Poisson log-link model. An NB2 quasi-likelihood model,
-with a moment-estimated dispersion parameter, checks sensitivity to
-overdispersion. Both report HC3-style sandwich standard errors and education
-incidence-rate ratios (IRRs). Rate-based group tests and HC3 linear regression
-on the eligible-pair rate are retained as exploratory sensitivity analyses
-rather than the primary count model.
+Education groups are compared descriptively using the eligible-pair rate.
+Welch ANOVA and Kruskal-Wallis are used as straightforward robustness checks;
+ordinary ANOVA and an ordinal education-level regression are retained as
+supplementary analyses. These tests are exploratory and do not establish a
+causal effect of education.
 
 ## Education recoding
 
@@ -76,9 +73,9 @@ English/Spanish tokens and 2,980 conservative switch events. Group means were
 Welch's test (`p = .8976`) and Kruskal-Wallis (`p = .8434`) did not support a
 group difference.
 
-These verified figures use the backward-compatible valid-token rate. The
-eligible-pair rates and count-model estimates are not reported until the
-upgraded pipeline is rerun locally on the licensed source data.
+These verified figures use the backward-compatible valid-token rate. Updated
+eligible-pair rates are not reported until the streamlined pipeline is rerun
+locally on the licensed source data.
 
 ## Interpretation
 

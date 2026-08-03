@@ -79,15 +79,5 @@ R-squared and sample size for the eligible-pair rate sensitivity analysis.
 
 ### `statistical_summary.json`
 
-Structured combined output containing all inferential tests, count models,
-ordinary-ANOVA effect size, HC3 regression and the IQR outlier sensitivity
-audit.
-
-### `count_regression_models.csv`
-
-Participant switch counts are modelled with
-`log(eligible_adjacent_pairs)` as an offset. The output contains a Poisson model
-and an NB2 quasi-likelihood sensitivity model whose overdispersion parameter is
-estimated by moments. Education effects are reported as coefficients and
-incidence-rate ratios (IRRs), with HC3-style sandwich standard errors and
-confidence intervals.
+Structured combined output containing all inferential tests, ordinary-ANOVA
+effect size, HC3 regression and the IQR outlier sensitivity audit.
