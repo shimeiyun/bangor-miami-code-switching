@@ -39,6 +39,18 @@
 
 ## Participant rates
 
+The preferred exposure is `eligible_adjacent_pairs`: the number of consecutive
+`eng`/`spa` token pairs that the transition rule actually compares. Boundaries,
+other language labels and utterance changes do not contribute a pair.
+
+`switch_rate_per_1000_eligible_pairs` is:
+
+```text
+intra_switch_count / eligible_adjacent_pairs x 1,000
+```
+
+The valid-token rate below is retained for backward compatibility.
+
 `switch_rate_per_1000_valid_tokens` is:
 
 ```text
@@ -63,9 +75,19 @@ Only `eng` and `spa` contribute to the denominator.
 
 Long-format output containing the ordinal education-level slope, HC3 robust
 standard error, t statistic, p-value, normal-approximation confidence interval,
-R-squared and sample size.
+R-squared and sample size for the eligible-pair rate sensitivity analysis.
 
 ### `statistical_summary.json`
 
-Structured combined output containing all inferential tests, ordinary-ANOVA
-effect size, HC3 regression and the IQR outlier sensitivity audit.
+Structured combined output containing all inferential tests, count models,
+ordinary-ANOVA effect size, HC3 regression and the IQR outlier sensitivity
+audit.
+
+### `count_regression_models.csv`
+
+Participant switch counts are modelled with
+`log(eligible_adjacent_pairs)` as an offset. The output contains a Poisson model
+and an NB2 quasi-likelihood sensitivity model whose overdispersion parameter is
+estimated by moments. Education effects are reported as coefficients and
+incidence-rate ratios (IRRs), with HC3-style sandwich standard errors and
+confidence intervals.

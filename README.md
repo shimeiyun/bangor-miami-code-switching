@@ -40,8 +40,12 @@ speech data:
 5. removes corpus footer records without deleting linguistic tokens;
 6. handles ambiguous, mixed-morpheme, and non-word labels explicitly;
 7. generates token-, recording-, and participant-level quality checks;
-8. reproduces Welch ANOVA, Kruskal-Wallis, ordinary ANOVA, and HC3 regression;
-9. separates descriptive trends from inferential evidence.
+8. measures both valid tokens and eligible within-utterance adjacent pairs;
+9. models switch counts with a log-exposure offset using Poisson and NB2
+   quasi-likelihood regression;
+10. retains Welch ANOVA, Kruskal-Wallis, ordinary ANOVA, and HC3 regression as
+    transparent sensitivity analyses;
+11. separates descriptive trends from inferential evidence.
 
 ## Verified full-corpus run
 
@@ -89,7 +93,7 @@ The complete portfolio paper is available in
 │   ├── tokens.py               # heterogeneous TSV reader
 │   ├── switches.py             # annotated transition identifier
 │   ├── analysis.py             # participant aggregation
-│   ├── statistics.py           # inferential tests and HC3 regression
+│   ├── statistics.py           # count models and sensitivity analyses
 │   ├── pipeline.py             # end-to-end orchestration
 │   └── cli.py                  # command-line interface
 ├── tests/
@@ -115,8 +119,9 @@ python -m bangor_miami demo --output-dir results/demo
 ```
 
 The demo produces mapping audits, switch events, recording and participant
-rates, descriptive summaries, inferential tests, an ordinal regression, and a
-machine-readable statistical summary.
+rates, and descriptive summaries. With at least six participants, the same
+pipeline also writes inferential tests, offset count models, an HC3 rate
+regression, and a machine-readable statistical summary.
 
 ## Running with locally licensed corpus files
 
@@ -188,6 +193,8 @@ licence, citation requirements, and TalkBank ethics conditions.
 - the Low education group is very small;
 - the primary metric captures conservative token transitions, not every
   linguistic definition of code-switching;
+- the published full-corpus figures above predate the eligible-pair exposure
+  metric and count models; those new results require a licensed local rerun;
 - conversation topic, interlocutor relationship, and language proficiency are
   not yet modelled;
 - the statistical result is associational, not causal.
@@ -196,7 +203,7 @@ licence, citation requirements, and TalkBank ethics conditions.
 
 - add an independently reviewed speaker crosswalk;
 - compare conservative and permissive switch definitions;
-- model switch counts with token exposure;
+- add conversation- or recording-level clustering to the count models;
 - analyse intra- and inter-sentential switching separately;
 - add POS and clause-level predictors;
 - evaluate switch-point prediction using speaker-disjoint cross-validation.

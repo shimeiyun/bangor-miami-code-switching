@@ -33,14 +33,29 @@ The rule-based identifier never bridges an utterance boundary. It operates on
 the corpus-provided token-level language annotations; it is not an automatic
 language-identification classifier.
 
-For participant `i`:
+The preferred exposure is the number of eligible adjacent pairs: consecutive
+`eng`/`spa` tokens within the same recording, speaker and utterance, with no
+intervening reset label. For participant `i`:
 
 ```text
-switch_rate_i = switch_count_i / valid_eng_spa_tokens_i * 1000
+pair_rate_i = switch_count_i / eligible_adjacent_pairs_i * 1000
 ```
 
-This operational definition is intentionally narrower than the full
-linguistic concept of code-switching.
+The earlier valid-token rate is retained as a backward-compatible descriptive
+field. Eligible pairs are the more direct denominator because each pair is one
+opportunity under the implemented transition rule. This operational definition
+is intentionally narrower than the full linguistic concept of code-switching.
+
+## Statistical model
+
+The primary participant-level model treats `intra_switch_count` as a count and
+uses `log(eligible_adjacent_pairs)` as an offset. Education level enters as an
+ordinal predictor in a Poisson log-link model. An NB2 quasi-likelihood model,
+with a moment-estimated dispersion parameter, checks sensitivity to
+overdispersion. Both report HC3-style sandwich standard errors and education
+incidence-rate ratios (IRRs). Rate-based group tests and HC3 linear regression
+on the eligible-pair rate are retained as exploratory sensitivity analyses
+rather than the primary count model.
 
 ## Education recoding
 
@@ -60,6 +75,10 @@ English/Spanish tokens and 2,980 conservative switch events. Group means were
 13.63, 14.81 and 15.74 switches per 1,000 valid tokens for Low, Middle and High.
 Welch's test (`p = .8976`) and Kruskal-Wallis (`p = .8434`) did not support a
 group difference.
+
+These verified figures use the backward-compatible valid-token rate. The
+eligible-pair rates and count-model estimates are not reported until the
+upgraded pipeline is rerun locally on the licensed source data.
 
 ## Interpretation
 

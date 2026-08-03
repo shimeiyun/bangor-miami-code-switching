@@ -80,6 +80,12 @@ def run_pipeline(
             regression_rows,
             ["term", "value"],
         )
+        count_models = inference["count_regression_models"]
+        write_csv(
+            output_dir / "count_regression_models.csv",
+            count_models,
+            list(count_models[0]),
+        )
         (output_dir / "statistical_summary.json").write_text(
             json.dumps(inference, indent=2), encoding="utf-8"
         )

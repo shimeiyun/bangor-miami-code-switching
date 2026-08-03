@@ -8,6 +8,7 @@ from collections import defaultdict
 _EPS = 3.0e-14
 _FPMIN = 1.0e-300
 _MAX_ITER = 200
+_RATE_FIELD = "switch_rate_per_1000_eligible_pairs"
 
 
 def _beta_continued_fraction(a: float, b: float, x: float) -> float:
@@ -105,7 +106,7 @@ def _group_values(participants: list[dict]) -> dict[str, list[float]]:
     groups: dict[str, list[float]] = defaultdict(list)
     for row in participants:
         groups[row["education_group"]].append(
-            float(row["switch_rate_per_1000_valid_tokens"])
+            float(row[_RATE_FIELD])
         )
     return dict(groups)
 
@@ -229,7 +230,7 @@ def iqr_outlier_ids(participants: list[dict]) -> list[str]:
         rows_by_group[row["education_group"]].append(row)
     outliers = []
     for rows in rows_by_group.values():
-        rates = [float(row["switch_rate_per_1000_valid_tokens"]) for row in rows]
+        rates = [float(row[_RATE_FIELD]) for row in rows]
         q1 = _quantile(rates, 0.25)
         q3 = _quantile(rates, 0.75)
         lower = q1 - 1.5 * (q3 - q1)
@@ -237,14 +238,14 @@ def iqr_outlier_ids(participants: list[dict]) -> list[str]:
         outliers.extend(
             row["questionnaire_id"]
             for row in rows
-            if not lower <= float(row["switch_rate_per_1000_valid_tokens"]) <= upper
+            if not lower <= float(row[_RATE_FIELD]) <= upper
         )
     return sorted(outliers)
 
 
 def hc3_regression(participants: list[dict]) -> dict:
     x = [float(row["education_level"]) for row in participants]
-    y = [float(row["switch_rate_per_1000_valid_tokens"]) for row in participants]
+    y = [float(row[_RATE_FIELD]) for row in participants]
     n = len(x)
     sx = sum(x)
     sxx = sum(value * value for value in x)
@@ -301,6 +302,148 @@ def hc3_regression(participants: list[dict]) -> dict:
     }
 
 
+def _inverse_2x2(a: float, b: float, c: float) -> tuple[float, float, float]:
+    determinant = a * c - b * b
+    if abs(determinant) < 1.0e-12:
+        raise ValueError("Education level has insufficient variation for regression.")
+    return c / determinant, -b / determinant, a / determinant
+
+
+def _fit_offset_count_model(
+    participants: list[dict], alpha: float, model_name: str
+) -> dict:
+    """Fit a two-parameter log-link count model with an exposure offset.
+
+    ``alpha=0`` gives a Poisson mean-variance relationship. Positive ``alpha``
+    gives an NB2 quasi-likelihood variance, ``mu + alpha * mu**2``. Inference
+    uses an HC3-style sandwich covariance to reduce reliance on that variance
+    assumption.
+    """
+    eligible = [
+        row for row in participants if float(row["eligible_adjacent_pairs"]) > 0
+    ]
+    x = [float(row["education_level"]) for row in eligible]
+    y = [float(row["intra_switch_count"]) for row in eligible]
+    exposure = [float(row["eligible_adjacent_pairs"]) for row in eligible]
+    if len(eligible) < 3:
+        raise ValueError(
+            "At least three participants with positive exposure are required."
+        )
+    if sum(y) <= 0:
+        raise ValueError("At least one switch event is required for count regression.")
+
+    beta0 = math.log(sum(y) / sum(exposure))
+    beta1 = 0.0
+    converged = False
+    iterations = 0
+    for iterations in range(1, _MAX_ITER + 1):
+        info00 = info01 = info11 = rhs0 = rhs1 = 0.0
+        for xv, yv, ev in zip(x, y, exposure):
+            eta = math.log(ev) + beta0 + beta1 * xv
+            mu = math.exp(max(-700.0, min(700.0, eta)))
+            weight = mu / (1.0 + alpha * mu)
+            working = eta + (yv - mu) / mu - math.log(ev)
+            info00 += weight
+            info01 += weight * xv
+            info11 += weight * xv * xv
+            rhs0 += weight * working
+            rhs1 += weight * working * xv
+        inv00, inv01, inv11 = _inverse_2x2(info00, info01, info11)
+        new0 = inv00 * rhs0 + inv01 * rhs1
+        new1 = inv01 * rhs0 + inv11 * rhs1
+        if max(abs(new0 - beta0), abs(new1 - beta1)) < 1.0e-10:
+            beta0, beta1 = new0, new1
+            converged = True
+            break
+        beta0, beta1 = new0, new1
+
+    fitted = [
+        math.exp(max(-700.0, min(700.0, math.log(ev) + beta0 + beta1 * xv)))
+        for xv, ev in zip(x, exposure)
+    ]
+    info00 = info01 = info11 = 0.0
+    for xv, mu in zip(x, fitted):
+        weight = mu / (1.0 + alpha * mu)
+        info00 += weight
+        info01 += weight * xv
+        info11 += weight * xv * xv
+    inv00, inv01, inv11 = _inverse_2x2(info00, info01, info11)
+
+    meat00 = meat01 = meat11 = 0.0
+    pearson = 0.0
+    for xv, yv, mu in zip(x, y, fitted):
+        variance = mu + alpha * mu * mu
+        weight = mu / (1.0 + alpha * mu)
+        leverage = weight * (inv00 + 2.0 * inv01 * xv + inv11 * xv * xv)
+        score = (yv - mu) / (1.0 + alpha * mu)
+        adjusted = score / max(1.0e-12, 1.0 - leverage)
+        squared = adjusted * adjusted
+        meat00 += squared
+        meat01 += squared * xv
+        meat11 += squared * xv * xv
+        pearson += (yv - mu) ** 2 / variance
+
+    covariance11 = (
+        inv01 * inv01 * meat00
+        + 2.0 * inv01 * inv11 * meat01
+        + inv11 * inv11 * meat11
+    )
+    robust_se = math.sqrt(max(0.0, covariance11))
+    z_value = (
+        beta1 / robust_se
+        if robust_se
+        else (0.0 if beta1 == 0.0 else math.copysign(math.inf, beta1))
+    )
+    ci_lower = beta1 - 1.96 * robust_se
+    ci_upper = beta1 + 1.96 * robust_se
+    return {
+        "model": model_name,
+        "outcome": "intra_switch_count",
+        "offset": "log(eligible_adjacent_pairs)",
+        "education_level_coefficient": beta1,
+        "education_level_robust_se": robust_se,
+        "education_level_z": z_value,
+        "education_level_p_value": math.erfc(abs(z_value) / math.sqrt(2.0)),
+        "education_level_irr": math.exp(beta1),
+        "irr_95ci_lower": math.exp(ci_lower),
+        "irr_95ci_upper": math.exp(ci_upper),
+        "intercept": beta0,
+        "alpha": alpha,
+        "pearson_dispersion": pearson / (len(eligible) - 2),
+        "n": len(eligible),
+        "excluded_zero_exposure": len(participants) - len(eligible),
+        "converged": converged,
+        "iterations": iterations,
+    }
+
+
+def count_regression_models(participants: list[dict]) -> list[dict]:
+    """Fit Poisson and moment-alpha NB2 sensitivity count models."""
+    poisson = _fit_offset_count_model(participants, 0.0, "Poisson")
+    eligible = [
+        row for row in participants if float(row["eligible_adjacent_pairs"]) > 0
+    ]
+    fitted = [
+        float(row["eligible_adjacent_pairs"])
+        * math.exp(
+            poisson["intercept"]
+            + poisson["education_level_coefficient"]
+            * float(row["education_level"])
+        )
+        for row in eligible
+    ]
+    numerator = sum(
+        (float(row["intra_switch_count"]) - mu) ** 2 - mu
+        for row, mu in zip(eligible, fitted)
+    )
+    denominator = sum(mu * mu for mu in fitted)
+    alpha = max(0.0, numerator / denominator) if denominator else 0.0
+    nb2 = _fit_offset_count_model(
+        participants, alpha, "NB2 quasi-likelihood (moment alpha)"
+    )
+    return [poisson, nb2]
+
+
 def inferential_analysis(participants: list[dict]) -> dict:
     groups = _group_values(participants)
     ordinary = ordinary_anova(groups)
@@ -328,6 +471,7 @@ def inferential_analysis(participants: list[dict]) -> dict:
         "tests": tests,
         "ordinary_anova_eta_squared": ordinary["eta_squared"],
         "hc3_regression": hc3_regression(participants),
+        "count_regression_models": count_regression_models(participants),
         "outlier_questionnaire_ids": outlier_ids,
         "n_after_outlier_exclusion": len(reduced),
     }
