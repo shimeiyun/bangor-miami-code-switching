@@ -1,5 +1,52 @@
 const DEFAULT='I/eng love/eng mi/spa casa/spa today/eng';
 function run(){const raw=document.querySelector('#tokens').value.trim(),flow=document.querySelector('#token-flow'),count=document.querySelector('#switch-count'),note=document.querySelector('#explanation');flow.replaceChildren();if(!raw){count.textContent='0 switches';note.textContent='Enter synthetic token/label pairs.';return}const rows=raw.split(/\s+/).map(v=>{let k=v.lastIndexOf('/');return k>0?{word:v.slice(0,k),tag:v.slice(k+1).toLowerCase()}:null});if(rows.some(v=>!v||!['eng','spa','mixed'].includes(v.tag))){count.textContent='Check input';note.textContent='Use pairs such as hello/eng hola/spa or hm/mixed.';return}let prev=null,n=0;rows.forEach((v,i)=>{let valid=v.tag==='eng'||v.tag==='spa',change=valid&&prev&&prev!==v.tag;if(change)n++;if(i){let a=document.createElement('span');a.className='token-arrow'+(change?' is-switch':'');a.textContent=change?'↗':'→';flow.append(a)}let t=document.createElement('span');t.className='token'+(change?' is-switch':'');let w=document.createElement('strong'),tag=document.createElement('small');w.textContent=v.word;tag.textContent=v.tag;t.append(w,tag);flow.append(t);prev=valid?v.tag:null});count.textContent=`${n} switch${n===1?'':'es'}`;note.textContent=rows.some(v=>v.tag==='mixed')?'A mixed label resets the sequence: the next valid label does not bridge across it.':'Only adjacent valid eng/spa changes count inside this illustrative utterance.'}
-document.querySelector('#run').addEventListener('click',run);document.querySelector('#reset').addEventListener('click',()=>{document.querySelector('#tokens').value=DEFAULT;run()});run();
+const EXAMPLES = [
+  {id:'none', label:'0 switches', tokens:'I/eng found/eng the/eng book/eng'},
+  {id:'one', label:'1 switch', tokens:'We/eng went/eng juntos/spa'},
+  {id:'two', label:'2 switches', tokens:DEFAULT},
+  {id:'mixed', label:'Mixed boundary', tokens:'hello/eng hm/mixed hola/spa'}
+];
+const input = document.querySelector('#tokens');
+const presets = document.createElement('div');
+presets.className = 'example-presets';
+presets.setAttribute('role','group');
+presets.setAttribute('aria-label','Synthetic example sequences');
+const presetLabel = document.createElement('span');
+presetLabel.className = 'example-presets-label';
+presetLabel.textContent = 'TRY AN EXAMPLE';
+presets.append(presetLabel);
+const presetButtons = document.createElement('div');
+presetButtons.className = 'example-presets-buttons';
+function selectExample(id){
+  presetButtons.querySelectorAll('button').forEach(button =>
+    button.setAttribute('aria-pressed',String(button.dataset.example===id))
+  );
+}
+EXAMPLES.forEach(example => {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.dataset.example = example.id;
+  button.textContent = example.label;
+  button.addEventListener('click',() => {
+    input.value = example.tokens;
+    selectExample(example.id);
+    run();
+  });
+  presetButtons.append(button);
+});
+presets.append(presetButtons);
+document.querySelector('label[for="tokens"]').before(presets);
+input.addEventListener('input',() => selectExample(null));
+document.querySelector('#run').addEventListener('click',run);
+const clearButton = document.querySelector('#reset');
+clearButton.textContent = 'Clear input';
+clearButton.addEventListener('click',() => {
+  input.value = '';
+  selectExample(null);
+  run();
+  input.focus();
+});
+selectExample('two');
+run();
 const CASES={unique:['MATCH FOUND','One questionnaire row matches recording, age and sex. This example would pass the strict matching rule.'],ambiguous:['NO MATCH ASSIGNED','Two rows fit the evidence. I leave the speaker unmatched rather than choose one.'],partial:['NO MATCH ASSIGNED','The recording matches, but the age does not. A filename match alone is not enough.']};function match(){let [a,b]=CASES[document.querySelector('#match-case').value],out=document.querySelector('#match-output');out.replaceChildren();let h=document.createElement('strong');h.textContent=a;out.append(h,document.createTextNode(b))}document.querySelector('#match-case').addEventListener('change',match);match();
 const groups=[{name:'Low (1–2)',n:5,mean:13.63,median:9.51,sd:11.05},{name:'Middle (3)',n:31,mean:14.81,median:12.76,sd:11.63},{name:'High (4–5)',n:37,mean:15.74,median:14.14,sd:10.47}];let measure='mean',selected=0;function chart(){let host=document.querySelector('#group-chart');host.replaceChildren();document.querySelector('#chart-title').textContent=({mean:'Mean switch rate',median:'Median switch rate',sd:'Standard deviation'})[measure];let max=Math.max(...groups.map(g=>g[measure]));groups.forEach((g,i)=>{let b=document.createElement('button');b.className='collocate-row';b.setAttribute('aria-pressed',String(selected===i));b.setAttribute('aria-label',`${g.name}: ${g[measure].toFixed(2)}, ${g.n} participants`);let name=document.createElement('span');name.className='collocate-name';name.textContent=g.name;let track=document.createElement('span');track.className='bar-track';let fill=document.createElement('span');fill.className='bar-fill';fill.style.width=`${g[measure]/max*100}%`;track.append(fill);let val=document.createElement('span');val.className='collocate-value';val.textContent=g[measure].toFixed(2);b.append(name,track,val);b.addEventListener('click',()=>{selected=i;chart()});host.append(b)});let g=groups[selected],detail=document.querySelector('#group-detail');detail.replaceChildren();let title=document.createElement('div');title.className='term-heading';title.textContent=g.name;let summary=document.createElement('p');summary.className='term-summary';summary.textContent=`${g.n} independent participant${g.n===1?'':'s'} in this researcher-defined group.`;let grid=document.createElement('div');grid.className='detail-grid';[['Mean',g.mean],['Median',g.median],['SD',g.sd]].forEach(([name,value])=>{let box=document.createElement('div'),a=document.createElement('strong'),b=document.createElement('span');a.textContent=value.toFixed(2);b.textContent=name;box.append(a,b);grid.append(box)});detail.append(title,summary,grid)}document.querySelector('#measure').addEventListener('click',e=>{let b=e.target.closest('button[data-measure]');if(!b)return;measure=b.dataset.measure;document.querySelectorAll('#measure button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));chart()});chart();
